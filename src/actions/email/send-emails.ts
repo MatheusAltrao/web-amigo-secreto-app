@@ -4,6 +4,7 @@ import { ParticipantsProps } from "@/app/new-group/components/form-create-group"
 import { EmailTemplate } from "@/components/commons/email-template";
 import { Resend } from "resend";
 import { GroupByUserProps } from "../group/get-group-by-user";
+import { delayPromises } from "@/helpers/delay-promises";
 
 export async function sendEmailsAction(group: GroupByUserProps) {
   const resend = new Resend(process.env.RESEND_API_KEY);
@@ -31,7 +32,9 @@ export async function sendEmailsAction(group: GroupByUserProps) {
     };
   });
 
-  const emailPromises = arrayWithSecretFriend.map(async (participant) => {
+  const results = [];
+
+  for (const participant of arrayWithSecretFriend) {
     const { data, error } = await resend.emails.send({
       from: "Acme <noreplay@amigo-secreto.dev>",
       to: [participant.email],
@@ -46,14 +49,15 @@ export async function sendEmailsAction(group: GroupByUserProps) {
 
     if (error) {
       throw new Error(
-        `Failed to send email to ${participant.email}: ${error.message}`
+        `Falha ao enviar e-mail para ${participant.email}: ${error.message}`
       );
     }
 
-    return data;
-  });
+    results.push(data);
+    await delayPromises(600);
+  }
 
-  const results = await Promise.all(emailPromises);
+  console.log(results);
 
   return results;
 }

@@ -50,47 +50,49 @@ export default async function GroupByIdPage({ params }: GroupByIdPageProps) {
 
   return (
     <Container>
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>{group?.name}</CardTitle>
-          <CardDescription className="space-y-3">
-            <div>{group?.description}</div>
+      <div className="flex justify-center">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle>{group?.name}</CardTitle>
+            <CardDescription className="space-y-3">
+              <div>{group?.description}</div>
 
-            <div>
-              <span className="text-xs">
-                Criado em: {format(new Date(group?.createdAt), "dd/MM/yyyy")}
-              </span>
-            </div>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between gap-2">
-              <h2>Participantes</h2>
-              <SendEmailsButton group={group} />
-            </div>
+              <div>
+                <span className="text-xs">
+                  Criado em: {format(new Date(group?.createdAt), "dd/MM/yyyy")}
+                </span>
+              </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <h2>Participantes</h2>
+                <SendEmailsButton group={group} />
+              </div>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {participants.map((participant, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{participant.name}</TableCell>
-                    <TableCell>{participant.email}</TableCell>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Email</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {participants.map((participant, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{participant.name}</TableCell>
+                      <TableCell>{participant.email}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
-          <RevealCard secretFriend={secretFriend} />
-        </CardContent>
-      </Card>
+            <RevealCard secretFriend={secretFriend} />
+          </CardContent>
+        </Card>
+      </div>
     </Container>
   );
 }

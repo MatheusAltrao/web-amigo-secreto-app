@@ -13,10 +13,12 @@ export default async function GroupPage() {
 
   return (
     <Container>
-      <FormCreateGroup
-        userName={session.user?.name || ""}
-        userEmail={session.user?.email || ""}
-      />
+      <div className="flex justify-center">
+        <FormCreateGroup
+          userName={session.user?.name || ""}
+          userEmail={session.user?.email || ""}
+        />
+      </div>
     </Container>
   );
 }
