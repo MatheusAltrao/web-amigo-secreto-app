@@ -1,4 +1,4 @@
-'use server'
+"use server";
 import {
   Table,
   TableBody,
@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 
 import {
   Card,
@@ -14,32 +14,39 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 
-import { getReadParticipantsAction } from '@/actions/group/get-read-participants'
-import { ParticipantsProps } from '@/app/new-group/components/form-create-group'
-import { format } from 'date-fns'
-import { redirect } from 'next/navigation'
-import SendEmailsButton from '@/components/commons/send-emails-button'
-import RevealCard from '@/components/commons/reveal-card'
-import { findMySecretFriend } from '@/actions/group/finde-my-secred-friend'
-import Container from '@/components/commons/container'
+import { getReadParticipantsAction } from "@/actions/group/get-read-participants";
+import { ParticipantsProps } from "@/app/new-group/components/form-create-group";
+import { format } from "date-fns";
+import { redirect } from "next/navigation";
+import SendEmailsButton from "@/components/commons/send-emails-button";
+import RevealCard from "@/components/commons/reveal-card";
+import { findMySecretFriend } from "@/actions/group/finde-my-secred-friend";
+import Container from "@/components/commons/container";
+import { auth } from "@/lib/auth";
 
 interface GroupByIdPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function GroupByIdPage({ params }: GroupByIdPageProps) {
-  const id = (await params).id
-  const group = await getReadParticipantsAction(id)
+  const session = await auth();
 
-  if (!group) {
-    redirect('/groups')
+  if (!session?.user) {
+    redirect("/");
   }
 
-  const participants: ParticipantsProps[] = group?.participants || []
+  const id = (await params).id;
+  const group = await getReadParticipantsAction(id);
 
-  const secretFriend = await findMySecretFriend({ id })
+  if (!group) {
+    redirect("/groups");
+  }
+
+  const participants: ParticipantsProps[] = group?.participants || [];
+
+  const secretFriend = await findMySecretFriend({ id });
 
   return (
     <Container>
@@ -51,7 +58,7 @@ export default async function GroupByIdPage({ params }: GroupByIdPageProps) {
 
             <div>
               <span className="text-xs">
-                Criado em: {format(new Date(group?.createdAt), 'dd/MM/yyyy')}
+                Criado em: {format(new Date(group?.createdAt), "dd/MM/yyyy")}
               </span>
             </div>
           </CardDescription>
@@ -85,5 +92,5 @@ export default async function GroupByIdPage({ params }: GroupByIdPageProps) {
         </CardContent>
       </Card>
     </Container>
-  )
+  );
 }

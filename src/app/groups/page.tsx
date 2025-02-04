@@ -1,10 +1,18 @@
-import { getGroupByUserAction } from '@/actions/group/get-group-by-user'
-import GroupCard from './components/group-card'
-import Link from 'next/link'
-import Container from '@/components/commons/container'
+import { getGroupByUserAction } from "@/actions/group/get-group-by-user";
+import GroupCard from "./components/group-card";
+import Link from "next/link";
+import Container from "@/components/commons/container";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function GroupsPage() {
-  const groups = await getGroupByUserAction()
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/");
+  }
+
+  const groups = await getGroupByUserAction();
 
   return (
     <Container>
@@ -13,13 +21,13 @@ export default async function GroupsPage() {
       </div>
       {groups?.length === 0 && (
         <p className="text-center">
-          Você não criou nenhum grupo ainda clique{' '}
-          <Link className="text-primary underline" href={'/new-group'}>
+          Você não criou nenhum grupo ainda clique{" "}
+          <Link className="text-primary underline" href={"/new-group"}>
             aqui
-          </Link>{' '}
+          </Link>{" "}
           para criar um.
         </p>
       )}
     </Container>
-  )
+  );
 }
