@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { assignSecretFriends } from "@/helpers/assign-secret-friends";
 import { Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -53,6 +54,7 @@ export default function FormCreateGroup({
     const newParticipants = participants.filter((_, i) => i !== index);
     setParticipants(newParticipants);
   };
+
   const handleUpdateParticipant = (
     index: number,
     field: "name" | "email",
@@ -65,32 +67,12 @@ export default function FormCreateGroup({
     setParticipants(updatedParticipants);
   };
 
-  const arrayWithSecretFriend = participants.map((participant, index, arr) => {
-    if (participants.length < 2) {
-      return {
-        ...participant,
-        secretFriend: participant.name,
-      };
-    }
-
-    let secretFriend;
-    do {
-      const remainingParticipants = arr.filter((_, i) => i !== index);
-      secretFriend =
-        remainingParticipants[
-          Math.floor(Math.random() * remainingParticipants.length)
-        ];
-    } while (participant.name === secretFriend.name);
-    return {
-      ...participant,
-      secretFriend: secretFriend.name,
-    };
-  });
-
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      const arrayWithSecretFriend = assignSecretFriends(participants);
+
       const group = await createGroupAction({
         groupDescription,
         groupName,
