@@ -1,7 +1,7 @@
-import Header from "./header";
+import Header from './header'
 
 interface ContainerProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export default function Container({ children }: ContainerProps) {
@@ -13,5 +13,5 @@ export default function Container({ children }: ContainerProps) {
         <div>{children}</div>
       </div>
     </div>
-  );
+  )
 }
