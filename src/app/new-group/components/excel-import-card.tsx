@@ -137,8 +137,6 @@ export default function ExcelImportCard({
     }
   };
 
-  console.log(participants);
-
   return (
     <Dialog>
       <DialogTrigger>

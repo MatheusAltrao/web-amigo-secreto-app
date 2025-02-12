@@ -48,8 +48,6 @@ export default async function GroupByIdPage({ params }: GroupByIdPageProps) {
 
   const secretFriend = await findMySecretFriend({ id });
 
-  console.log(secretFriend);
-
   return (
     <Container>
       <div className="flex justify-center">
