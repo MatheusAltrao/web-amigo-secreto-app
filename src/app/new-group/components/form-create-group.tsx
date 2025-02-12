@@ -17,6 +17,7 @@ import { Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import ExcelImportCard from "./excel-import-card";
 
 export interface ParticipantsProps {
   name: string;
@@ -142,6 +143,13 @@ export default function FormCreateGroup({
                   e-mail será usado para enviarmos o amigo que o usuário tirou
                 </p>
               </div>
+
+              <ExcelImportCard
+                userName={userName}
+                userEmail={userEmail}
+                groupDescription={groupDescription}
+                groupName={groupName}
+              />
 
               <ScrollArea className="h-[300px] overflow-auto w-full">
                 <div className="pr-4 flex flex-col gap-2 w-full">
