@@ -44,6 +44,7 @@ export async function sendEmailsAction(group: GroupByUserProps) {
         name: participant.name,
         secretFriend: participant.secretFriend,
         title: group.name,
+        gift: participant.gift,
       }),
     })
 

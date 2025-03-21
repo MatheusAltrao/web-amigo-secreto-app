@@ -17,10 +17,12 @@ import { Plus, Trash2, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
+import ExcelImportCard from './excel-import-card'
 
 export interface ParticipantsProps {
   name: string
   email: string
+  gift?: string
 }
 
 interface FormCreateGroupProps {
@@ -33,8 +35,8 @@ export default function FormCreateGroup({
   userEmail,
 }: FormCreateGroupProps) {
   const [participants, setParticipants] = useState<ParticipantsProps[]>([
-    { name: userName, email: userEmail },
-    { name: '', email: '' },
+    { name: userName, email: userEmail, gift: '' },
+    { name: '', email: '', gift: '' },
   ])
   const [groupName, setGroupName] = useState<string>('')
   const [groupDescription, setGroupDescription] = useState<string>('')
@@ -46,7 +48,7 @@ export default function FormCreateGroup({
   }, [participants])
 
   const handleAddParticipant = () => {
-    setParticipants([...participants, { name: '', email: '' }])
+    setParticipants([...participants, { name: '', email: '', gift: '' }])
   }
 
   const handleRemoveParticipant = (index: number) => {
@@ -57,13 +59,14 @@ export default function FormCreateGroup({
 
   const handleUpdateParticipant = (
     index: number,
-    field: 'name' | 'email',
+    field: 'name' | 'email' | 'gift',
     value: string,
   ) => {
-    if (index === 0) return
+    if (index === 0 && field !== 'gift') return
     const updatedParticipants = participants.map((participant, i) =>
       i === index ? { ...participant, [field]: value } : participant,
     )
+
     setParticipants(updatedParticipants)
   }
 
@@ -83,8 +86,8 @@ export default function FormCreateGroup({
       setGroupName('')
       setGroupDescription('')
       setParticipants([
-        { name: userName, email: userEmail },
-        { name: '', email: '' },
+        { name: userName, email: userEmail, gift: '' },
+        { name: '', email: '', gift: '' },
       ])
       router.push(`/groups/${group}`)
     } catch (error) {
@@ -141,6 +144,13 @@ export default function FormCreateGroup({
                 </p>
               </div>
 
+              <ExcelImportCard
+                userName={userName}
+                userEmail={userEmail}
+                groupDescription={groupDescription}
+                groupName={groupName}
+              />
+
               <ScrollArea className="h-[300px] overflow-auto w-full">
                 <div className="pr-4 flex flex-col gap-2 w-full">
                   {participants.map((participant, index) => (
@@ -181,17 +191,38 @@ export default function FormCreateGroup({
                           readOnly={index === 0}
                         />
                       </div>
+
                       <div>
-                        {index > 0 && (
-                          <Button
-                            type="button"
-                            onClick={() => handleRemoveParticipant(index)}
-                            size={'icon'}
-                            variant={'secondary'}
-                          >
-                            <Trash2 />
-                          </Button>
-                        )}
+                        <Label htmlFor={`gift-${index}`}>
+                          Sugestão de presente
+                        </Label>
+                        <Input
+                          value={participant.gift}
+                          onChange={(e) =>
+                            handleUpdateParticipant(
+                              index,
+                              'gift',
+                              e.target.value,
+                            )
+                          }
+                          type="text"
+                          required
+                          id={`gift-${index}`}
+                          placeholder="Presente opcional"
+                        />
+                      </div>
+
+                      <div>
+                        <Button
+                          type="button"
+                          className="disabled:cursor-not-allowed"
+                          onClick={() => handleRemoveParticipant(index)}
+                          size={'icon'}
+                          disabled={index === 0}
+                          variant={'secondary'}
+                        >
+                          <Trash2 />
+                        </Button>
                       </div>
                     </div>
                   ))}
