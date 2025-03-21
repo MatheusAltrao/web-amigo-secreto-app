@@ -1,6 +1,6 @@
-"use client";
-import { createGroupAction } from "@/actions/group/create-group-action";
-import { Button } from "@/components/ui/button";
+'use client'
+import { createGroupAction } from '@/actions/group/create-group-action'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,26 +8,26 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { assignSecretFriends } from "@/helpers/assign-secret-friends";
-import { Plus, Trash2, Users } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import ExcelImportCard from "./excel-import-card";
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { assignSecretFriends } from '@/helpers/assign-secret-friends'
+import { Plus, Trash2, Users } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import ExcelImportCard from './excel-import-card'
 
 export interface ParticipantsProps {
-  name: string;
-  email: string;
-  gift?: string;
+  name: string
+  email: string
+  gift?: string
 }
 
 interface FormCreateGroupProps {
-  userName: string;
-  userEmail: string;
+  userName: string
+  userEmail: string
 }
 
 export default function FormCreateGroup({
@@ -35,67 +35,67 @@ export default function FormCreateGroup({
   userEmail,
 }: FormCreateGroupProps) {
   const [participants, setParticipants] = useState<ParticipantsProps[]>([
-    { name: userName, email: userEmail, gift: "" },
-    { name: "", email: "", gift: "" },
-  ]);
-  const [groupName, setGroupName] = useState<string>("");
-  const [groupDescription, setGroupDescription] = useState<string>("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+    { name: userName, email: userEmail, gift: '' },
+    { name: '', email: '', gift: '' },
+  ])
+  const [groupName, setGroupName] = useState<string>('')
+  const [groupDescription, setGroupDescription] = useState<string>('')
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [participants]);
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [participants])
 
   const handleAddParticipant = () => {
-    setParticipants([...participants, { name: "", email: "", gift: "" }]);
-  };
+    setParticipants([...participants, { name: '', email: '', gift: '' }])
+  }
 
   const handleRemoveParticipant = (index: number) => {
-    if (index === 0) return;
-    const newParticipants = participants.filter((_, i) => i !== index);
-    setParticipants(newParticipants);
-  };
+    if (index === 0) return
+    const newParticipants = participants.filter((_, i) => i !== index)
+    setParticipants(newParticipants)
+  }
 
   const handleUpdateParticipant = (
     index: number,
-    field: "name" | "email" | "gift",
-    value: string
+    field: 'name' | 'email' | 'gift',
+    value: string,
   ) => {
-    if (index === 0 && field !== "gift") return;
+    if (index === 0 && field !== 'gift') return
     const updatedParticipants = participants.map((participant, i) =>
-      i === index ? { ...participant, [field]: value } : participant
-    );
+      i === index ? { ...participant, [field]: value } : participant,
+    )
 
-    setParticipants(updatedParticipants);
-  };
+    setParticipants(updatedParticipants)
+  }
 
   const handleCreateGroup = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
-      const arrayWithSecretFriend = assignSecretFriends(participants);
+      const arrayWithSecretFriend = assignSecretFriends(participants)
 
       const group = await createGroupAction({
         groupDescription,
         groupName,
         participants: arrayWithSecretFriend,
-      });
+      })
 
-      toast.success("Grupo criado com sucesso");
-      setGroupName("");
-      setGroupDescription("");
+      toast.success('Grupo criado com sucesso')
+      setGroupName('')
+      setGroupDescription('')
       setParticipants([
-        { name: userName, email: userEmail, gift: "" },
-        { name: "", email: "", gift: "" },
-      ]);
-      router.push(`/groups/${group}`);
+        { name: userName, email: userEmail, gift: '' },
+        { name: '', email: '', gift: '' },
+      ])
+      router.push(`/groups/${group}`)
     } catch (error) {
-      console.log(error);
-      toast.error("Falha ao criar grupo");
-      return false;
+      console.log(error)
+      toast.error('Falha ao criar grupo')
+      return false
     }
-  };
+  }
 
   return (
     <Card className="w-full max-w-2xl">
@@ -162,8 +162,8 @@ export default function FormCreateGroup({
                           onChange={(e) =>
                             handleUpdateParticipant(
                               index,
-                              "name",
-                              e.target.value
+                              'name',
+                              e.target.value,
                             )
                           }
                           type="text"
@@ -180,8 +180,8 @@ export default function FormCreateGroup({
                           onChange={(e) =>
                             handleUpdateParticipant(
                               index,
-                              "email",
-                              e.target.value
+                              'email',
+                              e.target.value,
                             )
                           }
                           type="email"
@@ -201,8 +201,8 @@ export default function FormCreateGroup({
                           onChange={(e) =>
                             handleUpdateParticipant(
                               index,
-                              "gift",
-                              e.target.value
+                              'gift',
+                              e.target.value,
                             )
                           }
                           type="text"
@@ -217,9 +217,9 @@ export default function FormCreateGroup({
                           type="button"
                           className="disabled:cursor-not-allowed"
                           onClick={() => handleRemoveParticipant(index)}
-                          size={"icon"}
+                          size={'icon'}
                           disabled={index === 0}
-                          variant={"secondary"}
+                          variant={'secondary'}
                         >
                           <Trash2 />
                         </Button>
@@ -238,7 +238,7 @@ export default function FormCreateGroup({
           <Button
             type="button"
             onClick={handleAddParticipant}
-            variant={"outline"}
+            variant={'outline'}
           >
             <Plus size={20} /> Adicionar Amigo
           </Button>
@@ -248,5 +248,5 @@ export default function FormCreateGroup({
         </CardFooter>
       </form>
     </Card>
-  );
+  )
 }

@@ -6,9 +6,7 @@ export async function signInAction() {
   const session = await auth()
 
   if (!session) {
-    return await signIn('google', {
-      redirectTo: '/new-group',
-    })
+    return await signIn('google')
   }
 
   return await signOut({

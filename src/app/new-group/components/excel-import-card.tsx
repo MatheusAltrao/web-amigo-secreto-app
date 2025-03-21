@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Download, Upload, Users } from "lucide-react";
+import { useState } from 'react'
+import { Download, Upload, Users } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -9,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -18,19 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import * as XLSX from "xlsx";
-import { assignSecretFriends } from "@/helpers/assign-secret-friends";
-import { createGroupAction } from "@/actions/group/create-group-action";
-import { validateExcelData } from "@/helpers/valid-excel-data";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+} from '@/components/ui/dialog'
+import * as XLSX from 'xlsx'
+import { assignSecretFriends } from '@/helpers/assign-secret-friends'
+import { createGroupAction } from '@/actions/group/create-group-action'
+import { validateExcelData } from '@/helpers/valid-excel-data'
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 interface ExcelImportCardProps {
-  userName: string;
-  userEmail: string;
-  groupName: string;
-  groupDescription: string;
+  userName: string
+  userEmail: string
+  groupName: string
+  groupDescription: string
 }
 
 export default function ExcelImportCard({
@@ -39,109 +39,109 @@ export default function ExcelImportCard({
   groupName,
   groupDescription,
 }: ExcelImportCardProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
-  const router = useRouter();
+  const [isDragging, setIsDragging] = useState(false)
+  const [fileName, setFileName] = useState<string | null>(null)
+  const [participants, setParticipants] = useState<any[]>([])
+  const router = useRouter()
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+    e.preventDefault()
+    setIsDragging(true)
+  }
 
   const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+    setIsDragging(false)
+  }
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith(".xlsx")) {
-      setFileName(file.name);
-      handleFileUpload(file);
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file && file.name.endsWith('.xlsx')) {
+      setFileName(file.name)
+      handleFileUpload(file)
     } else {
-      alert("Por favor, importe apenas arquivos Excel (.xlsx)");
+      alert('Por favor, importe apenas arquivos Excel (.xlsx)')
     }
-  };
+  }
 
   const handleFileUpload = (file: File) => {
-    const reader = new FileReader();
+    const reader = new FileReader()
 
     reader.onload = (event) => {
-      const data = event.target?.result;
-      if (!data) return;
+      const data = event.target?.result
+      if (!data) return
 
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
+      const workbook = XLSX.read(data, { type: 'binary' })
+      const sheetName = workbook.SheetNames[0]
+      const sheet = workbook.Sheets[sheetName]
 
-      const jsonData: any[] = XLSX.utils.sheet_to_json(sheet);
+      const jsonData: any[] = XLSX.utils.sheet_to_json(sheet)
 
       if (!validateExcelData(jsonData)) {
         alert(
-          "O arquivo contém colunas inválidas ou valores ausentes! as colunas precisam ser 'name', 'email' e 'gift'"
-        );
-        return;
+          "O arquivo contém colunas inválidas ou valores ausentes! as colunas precisam ser 'name', 'email' e 'gift'",
+        )
+        return
       }
 
-      console.log("Dados Importados:", jsonData);
-      setParticipants(jsonData);
-    };
+      console.log('Dados Importados:', jsonData)
+      setParticipants(jsonData)
+    }
 
-    reader.readAsBinaryString(file);
-  };
+    reader.readAsBinaryString(file)
+  }
 
   const handleDownload = () => {
-    const wb = XLSX.utils.book_new();
-    const columns = ["name", "email", "gift"];
+    const wb = XLSX.utils.book_new()
+    const columns = ['name', 'email', 'gift']
     const participants = [
-      [userName, userEmail, "Mouse"],
-      ["Robson", "rob@gmail.com", "Teclado"],
-    ];
+      [userName, userEmail, 'Mouse'],
+      ['Robson', 'rob@gmail.com', 'Teclado'],
+    ]
 
-    const data = [columns, ...participants];
-    const ws = XLSX.utils.aoa_to_sheet(data);
+    const data = [columns, ...participants]
+    const ws = XLSX.utils.aoa_to_sheet(data)
 
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.utils.book_append_sheet(wb, ws, 'Template')
 
-    XLSX.writeFile(wb, "template-amigo-secreto.xlsx");
-  };
+    XLSX.writeFile(wb, 'template-amigo-secreto.xlsx')
+  }
 
   const handleCreateGroup = async () => {
     if (participants.length <= 1) {
-      alert("Por favor, importe pelo menos 2 participantes");
-      return;
+      alert('Por favor, importe pelo menos 2 participantes')
+      return
     }
 
-    if (groupName === "" || groupDescription === "") {
-      alert("Por favor, preencha o nome e a descrição do grupo");
-      return;
+    if (groupName === '' || groupDescription === '') {
+      alert('Por favor, preencha o nome e a descrição do grupo')
+      return
     }
 
     try {
-      const arrayWithSecretFriend = assignSecretFriends(participants);
+      const arrayWithSecretFriend = assignSecretFriends(participants)
 
       const group = await createGroupAction({
         groupDescription,
         groupName,
         participants: arrayWithSecretFriend,
-      });
+      })
 
-      toast.success("Grupo criado com sucesso");
-      router.push(`/groups/${group}`);
+      toast.success('Grupo criado com sucesso')
+      router.push(`/groups/${group}`)
     } catch (error) {
-      console.log(error);
-      toast.error("Falha ao criar grupo");
-      return false;
+      console.log(error)
+      toast.error('Falha ao criar grupo')
+      return false
     }
-  };
+  }
 
   return (
     <Dialog>
       <DialogTrigger>
         <p className="text-xs ">
-          Você pode importar um arquivo xlsx clicando{" "}
+          Você pode importar um arquivo xlsx clicando{' '}
           <span className="text-primary underline">aqui</span>
         </p>
       </DialogTrigger>
@@ -160,7 +160,7 @@ export default function ExcelImportCard({
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              variant={"secondary"}
+              variant={'secondary'}
               onClick={handleDownload}
               className="w-full"
             >
@@ -174,8 +174,8 @@ export default function ExcelImportCard({
                 onDrop={handleDrop}
                 className={`border-2 w-full border-dashed rounded-lg p-8 text-center transition-colors ${
                   isDragging
-                    ? "border-primary bg-primary/10"
-                    : "border-gray-300"
+                    ? 'border-primary bg-primary/10'
+                    : 'border-gray-300'
                 }`}
               >
                 <Upload className="mx-auto h-12 w-12 text-gray-400" />
@@ -202,5 +202,5 @@ export default function ExcelImportCard({
         </Card>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
