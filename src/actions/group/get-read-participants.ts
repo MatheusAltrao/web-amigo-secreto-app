@@ -1,25 +1,33 @@
-'use server'
+"use server";
 
-import { auth } from '@/lib/auth'
-import { db } from '@/lib/firebase'
-import { GroupByUserProps } from './get-group-by-user'
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/firebase";
+import { GroupByUserProps } from "./get-group-by-user";
 
 export async function getReadParticipantsAction(id: string) {
-  const session = await auth()
+  const session = await auth();
 
   if (!session?.user) {
-    return
+    return;
   }
 
   if (!id) {
-    return
+    return;
   }
 
   try {
-    const groupDoc = await db.collection('groups').doc(id).get()
-    return groupDoc.data() as GroupByUserProps
+    const groupDoc = await db.collection("groups").doc(id).get();
+
+    if (!groupDoc.exists) {
+      return null;
+    }
+
+    return {
+      id: groupDoc.id,
+      ...groupDoc.data(),
+    } as GroupByUserProps;
   } catch (error) {
-    console.log(error)
-    return null
+    console.log(error);
+    return null;
   }
 }

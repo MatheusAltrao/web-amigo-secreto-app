@@ -3,12 +3,17 @@
 import { ParticipantsProps } from "@/app/new-group/components/form-create-group";
 import { EmailTemplate } from "@/components/commons/email-template";
 import { delayPromises } from "@/helpers/delay-promises";
+import { db } from "@/lib/firebase";
 import { Resend } from "resend";
 import { GroupByUserProps } from "../group/get-group-by-user";
 
 export async function sendEmailsAction(group: GroupByUserProps) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const participants: ParticipantsProps[] = group.participants;
+
+  if (!group.id) {
+    throw new Error("ID do grupo não encontrado");
+  }
 
   if (participants.length < 2) {
     throw new Error("É necessário pelo menos 2 participantes para o amigo secreto");
@@ -49,13 +54,24 @@ export async function sendEmailsAction(group: GroupByUserProps) {
   const results = assignments.map(({ participant, secretFriend }) => ({
     name: participant.name,
     email: participant.email,
-    gift: participant.gift,
+    gift: participant.gift || "",
     secretFriend: secretFriend.name,
   }));
 
   console.log("Sorteio do amigo secreto:", results);
 
-  // Enviar emails para cada participante
+  const updatedParticipants = participants.map((participant) => {
+    const assignment = results.find((r) => r.email === participant.email && r.name === participant.name);
+    return {
+      ...participant,
+      secretFriend: assignment?.secretFriend || "",
+    };
+  });
+
+  await db.collection("groups").doc(group.id).update({
+    participants: updatedParticipants,
+  });
+
   const emailResults = [];
 
   for (const assignment of results) {
@@ -68,7 +84,7 @@ export async function sendEmailsAction(group: GroupByUserProps) {
         name: assignment.name,
         secretFriend: assignment.secretFriend,
         title: group.name,
-        gift: assignment.gift,
+        gift: assignment.gift || "",
       }),
     });
 
@@ -79,8 +95,6 @@ export async function sendEmailsAction(group: GroupByUserProps) {
     emailResults.push(data);
     await delayPromises(600);
   }
-
-  console.log("Emails enviados:", emailResults);
 
   return results;
 }
