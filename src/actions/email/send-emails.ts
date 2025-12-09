@@ -1,6 +1,8 @@
 "use server";
 
 import { ParticipantsProps } from "@/app/new-group/components/form-create-group";
+import { EmailTemplate } from "@/components/commons/email-template";
+import { delayPromises } from "@/helpers/delay-promises";
 import { Resend } from "resend";
 import { GroupByUserProps } from "../group/get-group-by-user";
 
@@ -52,5 +54,33 @@ export async function sendEmailsAction(group: GroupByUserProps) {
   }));
 
   console.log("Sorteio do amigo secreto:", results);
+
+  // Enviar emails para cada participante
+  const emailResults = [];
+
+  for (const assignment of results) {
+    const { data, error } = await resend.emails.send({
+      from: "Acme <noreplay@amigo-secreto.dev>",
+      to: [assignment.email],
+      subject: group.name,
+      react: EmailTemplate({
+        description: group.description,
+        name: assignment.name,
+        secretFriend: assignment.secretFriend,
+        title: group.name,
+        gift: assignment.gift,
+      }),
+    });
+
+    if (error) {
+      throw new Error(`Falha ao enviar e-mail para ${assignment.email}: ${error.message}`);
+    }
+
+    emailResults.push(data);
+    await delayPromises(600);
+  }
+
+  console.log("Emails enviados:", emailResults);
+
   return results;
 }
