@@ -1,101 +1,88 @@
-'use client'
-import { createGroupAction } from '@/actions/group/create-group-action'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { assignSecretFriends } from '@/helpers/assign-secret-friends'
-import { Plus, Trash2, Users } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import ExcelImportCard from './excel-import-card'
+"use client";
+import { createGroupAction } from "@/actions/group/create-group-action";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { assignSecretFriends } from "@/helpers/assign-secret-friends";
+import { Plus, Trash2, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import ExcelImportCard from "./excel-import-card";
 
 export interface ParticipantsProps {
-  name: string
-  email: string
-  gift?: string
+  name: string;
+  email: string;
+  gift?: string;
 }
 
 interface FormCreateGroupProps {
-  userName: string
-  userEmail: string
+  userName: string;
+  userEmail: string;
 }
 
-export default function FormCreateGroup({
-  userName,
-  userEmail,
-}: FormCreateGroupProps) {
+export default function FormCreateGroup({ userName, userEmail }: FormCreateGroupProps) {
   const [participants, setParticipants] = useState<ParticipantsProps[]>([
-    { name: userName, email: userEmail, gift: '' },
-    { name: '', email: '', gift: '' },
-  ])
-  const [groupName, setGroupName] = useState<string>('')
-  const [groupDescription, setGroupDescription] = useState<string>('')
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
+    { name: userName, email: userEmail, gift: "" },
+    { name: "", email: "", gift: "" },
+  ]);
+  const [groupName, setGroupName] = useState<string>("");
+  const [groupDescription, setGroupDescription] = useState<string>("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [participants])
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [participants]);
 
   const handleAddParticipant = () => {
-    setParticipants([...participants, { name: '', email: '', gift: '' }])
-  }
+    setParticipants([...participants, { name: "", email: "", gift: "" }]);
+  };
 
   const handleRemoveParticipant = (index: number) => {
-    if (index === 0) return
-    const newParticipants = participants.filter((_, i) => i !== index)
-    setParticipants(newParticipants)
-  }
+    if (index === 0) return;
+    const newParticipants = participants.filter((_, i) => i !== index);
+    setParticipants(newParticipants);
+  };
 
-  const handleUpdateParticipant = (
-    index: number,
-    field: 'name' | 'email' | 'gift',
-    value: string,
-  ) => {
-    if (index === 0 && field !== 'gift') return
-    const updatedParticipants = participants.map((participant, i) =>
-      i === index ? { ...participant, [field]: value } : participant,
-    )
+  const handleUpdateParticipant = (index: number, field: "name" | "email" | "gift", value: string) => {
+    if (index === 0 && field !== "gift") return;
+    const updatedParticipants = participants.map((participant, i) => (i === index ? { ...participant, [field]: value } : participant));
 
-    setParticipants(updatedParticipants)
-  }
+    setParticipants(updatedParticipants);
+  };
 
   const handleCreateGroup = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+    e.preventDefault();
+    setIsLoading(true);
     try {
-      const arrayWithSecretFriend = assignSecretFriends(participants)
+      const arrayWithSecretFriend = assignSecretFriends(participants);
 
       const group = await createGroupAction({
         groupDescription,
         groupName,
         participants: arrayWithSecretFriend,
-      })
+      });
 
-      toast.success('Grupo criado com sucesso')
-      setGroupName('')
-      setGroupDescription('')
+      toast.success("Grupo criado com sucesso");
+      setGroupName("");
+      setGroupDescription("");
       setParticipants([
-        { name: userName, email: userEmail, gift: '' },
-        { name: '', email: '', gift: '' },
-      ])
-      router.push(`/groups/${group}`)
+        { name: userName, email: userEmail, gift: "" },
+        { name: "", email: "", gift: "" },
+      ]);
+      router.push(`/groups/${group}`);
+      setIsLoading(false);
     } catch (error) {
-      console.log(error)
-      toast.error('Falha ao criar grupo')
-      return false
+      console.log(error);
+      toast.error("Falha ao criar grupo");
+      setIsLoading(false);
+      return false;
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-2xl">
@@ -113,13 +100,7 @@ export default function FormCreateGroup({
               <div className="space-y-2">
                 <div>
                   <Label>Nome do grupo</Label>
-                  <Input
-                    onChange={(e) => setGroupName(e.target.value)}
-                    value={groupName}
-                    required
-                    type="text"
-                    placeholder="Amigos da firma"
-                  />
+                  <Input onChange={(e) => setGroupName(e.target.value)} value={groupName} required type="text" placeholder="Amigos da firma" />
                 </div>
 
                 <div>
@@ -139,17 +120,11 @@ export default function FormCreateGroup({
               <div className="space-y-1.5">
                 <h2 className="font-bold">Participantes</h2>
                 <p className="text-muted-foreground text-sm">
-                  Adicione o nome e o email dos participantes, lembre-se esse
-                  e-mail será usado para enviarmos o amigo que o usuário tirou
+                  Adicione o nome e o email dos participantes, lembre-se esse e-mail será usado para enviarmos o amigo que o usuário tirou
                 </p>
               </div>
 
-              <ExcelImportCard
-                userName={userName}
-                userEmail={userEmail}
-                groupDescription={groupDescription}
-                groupName={groupName}
-              />
+              <ExcelImportCard userName={userName} userEmail={userEmail} groupDescription={groupDescription} groupName={groupName} />
 
               <ScrollArea className="h-[300px] overflow-auto w-full">
                 <div className="pr-4 flex flex-col gap-2 w-full">
@@ -159,13 +134,7 @@ export default function FormCreateGroup({
                         <Label htmlFor={`name-${index}`}>Nome</Label>
                         <Input
                           value={participant.name}
-                          onChange={(e) =>
-                            handleUpdateParticipant(
-                              index,
-                              'name',
-                              e.target.value,
-                            )
-                          }
+                          onChange={(e) => handleUpdateParticipant(index, "name", e.target.value)}
                           type="text"
                           required
                           id={`name-${index}`}
@@ -177,13 +146,7 @@ export default function FormCreateGroup({
                         <Label htmlFor={`email-${index}`}>Email</Label>
                         <Input
                           value={participant.email}
-                          onChange={(e) =>
-                            handleUpdateParticipant(
-                              index,
-                              'email',
-                              e.target.value,
-                            )
-                          }
+                          onChange={(e) => handleUpdateParticipant(index, "email", e.target.value)}
                           type="email"
                           required
                           id={`email-${index}`}
@@ -193,20 +156,11 @@ export default function FormCreateGroup({
                       </div>
 
                       <div>
-                        <Label htmlFor={`gift-${index}`}>
-                          Sugestão de presente
-                        </Label>
+                        <Label htmlFor={`gift-${index}`}>Sugestão de presente</Label>
                         <Input
                           value={participant.gift}
-                          onChange={(e) =>
-                            handleUpdateParticipant(
-                              index,
-                              'gift',
-                              e.target.value,
-                            )
-                          }
+                          onChange={(e) => handleUpdateParticipant(index, "gift", e.target.value)}
                           type="text"
-                          required
                           id={`gift-${index}`}
                           placeholder="Presente opcional"
                         />
@@ -217,9 +171,9 @@ export default function FormCreateGroup({
                           type="button"
                           className="disabled:cursor-not-allowed"
                           onClick={() => handleRemoveParticipant(index)}
-                          size={'icon'}
+                          size={"icon"}
                           disabled={index === 0}
-                          variant={'secondary'}
+                          variant={"secondary"}
                         >
                           <Trash2 />
                         </Button>
@@ -235,11 +189,7 @@ export default function FormCreateGroup({
         </CardContent>
 
         <CardFooter className="border-t flex items-center justify-between gap-2 p-4">
-          <Button
-            type="button"
-            onClick={handleAddParticipant}
-            variant={'outline'}
-          >
+          <Button type="button" onClick={handleAddParticipant} variant={"outline"}>
             <Plus size={20} /> Adicionar Amigo
           </Button>
           <Button type="submit">
@@ -248,5 +198,5 @@ export default function FormCreateGroup({
         </CardFooter>
       </form>
     </Card>
-  )
+  );
 }
