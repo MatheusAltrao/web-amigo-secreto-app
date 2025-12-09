@@ -192,8 +192,8 @@ export default function FormCreateGroup({ userName, userEmail }: FormCreateGroup
           <Button type="button" onClick={handleAddParticipant} variant={"outline"}>
             <Plus size={20} /> Adicionar Amigo
           </Button>
-          <Button type="submit">
-            <Users size={20} /> Criar grupo
+          <Button disabled={isLoading} type="submit">
+            <Users size={20} /> {isLoading ? "Criando ..." : "Criar grupo"}
           </Button>
         </CardFooter>
       </form>
